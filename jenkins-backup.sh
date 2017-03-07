@@ -20,7 +20,7 @@ if [ -z "$JENKINS_HOME" -o -z "$DEST_FILE" ] ; then
 fi
 
 rm -rf "$ARC_DIR" "$TMP_TAR_NAME"
-for i in plugins jobs users secrets nodes;do
+for i in plugins jobs users secrets nodes .ssh;do
   mkdir -p "$ARC_DIR"/$i
 done
 
@@ -45,6 +45,14 @@ if [ "$(ls -A $JENKINS_HOME/nodes/)" ] ; then
   cp -R "$JENKINS_HOME/nodes/"* "$ARC_DIR/nodes"
 fi
 
+if [ "$(ls -A $JENKINS_HOME/.ssh/)" ] ; then
+  cp -R "$JENKINS_HOME/.ssh/"* "$ARC_DIR/.ssh"
+fi
+
+if [ "$(ls -A $JENKINS_HOME/jenkins-backup.sh)" ] ; then
+  cp "$JENKINS_HOME/jenkins-backup.sh" "$ARC_DIR/jenkins-backup.sh"
+fi
+
 function backup_jobs {
   local run_in_path=$1
   local rel_depth=${run_in_path#$JENKINS_HOME/jobs/}
@@ -60,7 +68,7 @@ function backup_jobs {
     else
       true
       #echo "Job! $JENKINS_HOME/jobs/$rel_depth/$job_name"
-    fi 
+    fi
   done
   #echo "Done in $(pwd)"
   cd -
